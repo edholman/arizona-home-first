@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(191, 30%, 54%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Neutral, organic Arizona colors */
+  --arizona-red: hsl(12, 45%, 55%);
+  --desert-blue: hsl(200, 25%, 50%);
+  --terracotta: hsl(25, 40%, 50%);
+  --sage: hsl(95, 20%, 55%);
+  --warm-white: hsl(45, 15%, 97%);
+  --canyon-orange: hsl(30, 35%, 60%);
+  --desert-sand: hsl(40, 25%, 75%);
+  --stone-gray: hsl(20, 8%, 45%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(191, 30%, 54%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased bg-warm-white text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-arizona-red {
+    background-color: var(--arizona-red);
+  }
+  
+  .text-arizona-red {
+    color: var(--arizona-red);
+  }
+  
+  .border-arizona-red {
+    border-color: var(--arizona-red);
+  }
+  
+  .bg-desert-blue {
+    background-color: var(--desert-blue);
+  }
+  
+  .text-desert-blue {
+    color: var(--desert-blue);
+  }
+  
+  .bg-terracotta {
+    background-color: var(--terracotta);
+  }
+  
+  .text-terracotta {
+    color: var(--terracotta);
+  }
+  
+  .bg-sage {
+    background-color: var(--sage);
+  }
+  
+  .text-sage {
+    color: var(--sage);
+  }
+  
+  .bg-warm-white {
+    background-color: var(--warm-white);
+  }
+  
+  .bg-canyon-orange {
+    background-color: var(--canyon-orange);
+  }
+  
+  .text-canyon-orange {
+    color: var(--canyon-orange);
+  }
+  
+  .bg-desert-sand {
+    background-color: var(--desert-sand);
+  }
+  
+  .text-stone-gray {
+    color: var(--stone-gray);
+  }
+  
+  .bg-terracotta {
+    background-color: var(--terracotta);
+  }
+  
+  .from-terracotta {
+    --tw-gradient-from: var(--terracotta);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+  }
+}
