@@ -47,7 +47,7 @@
       var likely = answers.credit !== 'below-620' && answers.income !== 'below-50k';
       body.innerHTML = likely
         ? '<div class="quiz-result"><div class="badge">&#10003;</div><h3>Good news! You may qualify.</h3>' +
-          '<p>Based on your answers, you may qualify for up to <strong>$10,000 in credits</strong> toward your closing costs, depending on your home price and loan. ' +
+          '<p>Based on your answers, you may qualify for up to <strong>$10,000 in homebuyer assistance</strong>, depending on your home price and loan. ' +
           'Tell us where to reach you and a licensed professional will review your options.</p>' +
           '<a class="btn btn-primary" href="#get-started">See My Options</a></div>'
         : '<div class="quiz-result maybe"><div class="badge">&#8594;</div><h3>You may still have options.</h3>' +
@@ -68,7 +68,7 @@
           'result: ' + (likely ? 'likely qualifies' : 'needs review')].join('; ');
         set('message', summary);
         var box = document.getElementById('quiz-summary');
-        if (box) { box.textContent = 'Your quiz answers will be included: ' + (likely ? 'you may qualify for up to $10,000 in credits.' : 'we will review your options.'); box.hidden = false; }
+        if (box) { box.textContent = 'Your quiz answers will be included: ' + (likely ? 'you may qualify for up to $10,000 in homebuyer assistance.' : 'we will review your options.'); box.hidden = false; }
       }
     }
     render();
