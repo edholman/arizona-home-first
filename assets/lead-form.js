@@ -65,7 +65,7 @@
 
   function fireConversion() {
     if (typeof window.gtag === 'function') {
-      try { window.gtag('event', 'conversion', { send_to: 'PENDING_AW_ID/PENDING_LABEL' }); } catch (e) { /* ignore */ }  // set to the Arizona Home First account's conversion
+      try { window.gtag('event', 'conversion', { send_to: 'AW-697276669/PENDING_LABEL' }); } catch (e) { /* ignore */ }  // PENDING: label of the 'Arizona Home First Lead' conversion action
     }
   }
 
