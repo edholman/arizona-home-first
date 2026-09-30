@@ -65,7 +65,7 @@
 
   function fireConversion() {
     if (typeof window.gtag === 'function') {
-      try { window.gtag('event', 'ads_conversion_Book_appointment_1', {}); } catch (e) { /* ignore */ }
+      try { window.gtag('event', 'conversion', { send_to: 'PENDING_AW_ID/PENDING_LABEL' }); } catch (e) { /* ignore */ }  // set to the Arizona Home First account's conversion
     }
   }
 
