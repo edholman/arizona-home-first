@@ -65,7 +65,7 @@
 
   function fireConversion() {
     if (typeof window.gtag === 'function') {
-      try { window.gtag('event', 'conversion', { send_to: 'AW-697276669/PENDING_LABEL' }); } catch (e) { /* ignore */ }  // PENDING: label of the 'Arizona Home First Lead' conversion action
+      try { window.gtag('event', 'conversion', { send_to: 'AW-697276669/j015CPqU-vEaEP2xvswC' }); } catch (e) { /* ignore */ }  // same conversion the original campaign optimized for; fires only after the server confirms the lead
     }
   }
 
