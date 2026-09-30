@@ -46,14 +46,14 @@
       // same qualifying logic as the original program: credit 620+ and income $50k+
       var likely = answers.credit !== 'below-620' && answers.income !== 'below-50k';
       body.innerHTML = likely
-        ? '<div class="quiz-result"><div class="badge">&#10003;</div><h3>Good news! You may qualify.</h3>' +
-          '<p>Based on your answers, you may qualify for up to <strong>$10,000 in homebuyer assistance</strong>, depending on your home price and loan. ' +
-          'Tell us where to reach you and a licensed professional will review your options.</p>' +
-          '<a class="btn btn-primary" href="#get-started">See My Options</a></div>'
-        : '<div class="quiz-result maybe"><div class="badge">&#8594;</div><h3>You may still have options.</h3>' +
-          '<p>Some answers fall outside our standard guidelines, but many buyers improve their position quickly with the right plan. ' +
-          'Leave your info and we will reach out with next steps.</p>' +
-          '<a class="btn btn-primary" href="#get-started">Get My Next Steps</a></div>';
+        ? '<div class="quiz-result"><div class="badge">&#10003;</div><h3>Great news! You may qualify.</h3>' +
+          '<p>Based on your answers, you may qualify for up to <strong>$10,000 in homebuyer assistance</strong>. ' +
+          'Join the waitlist to reserve your spot, and a program specialist will reach out to confirm your eligibility.</p>' +
+          '<a class="btn btn-primary" href="#get-started">Join the Waitlist</a></div>'
+        : '<div class="quiz-result maybe"><div class="badge">&#8594;</div><h3>Thanks for checking!</h3>' +
+          '<p>Some of your answers fall outside our current guidelines, but options open up often. ' +
+          'Join our waitlist and we will reach out as options become available for your situation.</p>' +
+          '<a class="btn btn-primary" href="#get-started">Join the Waitlist</a></div>';
       // hand the answers to the lead form
       var form = document.querySelector('form.lead-form');
       if (form) {
@@ -68,7 +68,7 @@
           'result: ' + (likely ? 'likely qualifies' : 'needs review')].join('; ');
         set('message', summary);
         var box = document.getElementById('quiz-summary');
-        if (box) { box.textContent = 'Your quiz answers will be included: ' + (likely ? 'you may qualify for up to $10,000 in homebuyer assistance.' : 'we will review your options.'); box.hidden = false; }
+        if (box) { box.textContent = likely ? 'Your quiz results: you may qualify for up to $10,000 in homebuyer assistance.' : 'Your quiz results are saved with your spot on the waitlist.'; box.hidden = false; }
       }
     }
     render();
