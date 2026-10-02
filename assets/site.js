@@ -11,6 +11,15 @@
     try { if (typeof window.gtag === 'function') window.gtag('event', 'azhf_' + name, props); } catch (e) { /* ignore */ }
   }
   window.azhfTrack = track;
+
+  // Tag each session as paid (Google/Microsoft ad click) or organic, so Clarity recordings can be filtered by it.
+  (function () {
+    var q = new URLSearchParams(window.location.search);
+    var paid = q.get('gclid') || q.get('gbraid') || q.get('wbraid') || q.get('msclkid') || /cpc|paid|ppc/i.test(q.get('utm_medium') || '');
+    var ref = document.referrer, source = paid ? 'paid' : (ref ? (/google|bing|yahoo|duckduckgo/i.test(ref) ? 'organic_search' : 'referral') : 'direct');
+    try { if (typeof window.clarity === 'function') window.clarity('set', 'traffic', source); } catch (e) { /* ignore */ }
+    try { (window.dataLayer = window.dataLayer || []).push({ event: 'azhf_traffic', traffic: source }); } catch (e) { /* ignore */ }
+  })();
   var once = {};
   function trackOnce(name, props) { if (!once[name]) { once[name] = true; track(name, props); } }
 
@@ -71,6 +80,11 @@
           'Join our waitlist and we will reach out as options become available for your situation.</p>' +
           '<a class="btn btn-primary" href="#get-started">Join the Waitlist</a></div>';
       track('quiz_complete', { quiz_result: likely ? 'likely' : 'needs_review' });
+      // Quiz done: every "Check If You Qualify" button now moves them forward to the waitlist form instead of back to the quiz.
+      Array.prototype.forEach.call(document.querySelectorAll('a[href="#eligibility"]'), function (a) {
+        a.setAttribute('href', '#get-started');
+        if (/check/i.test(a.textContent)) a.textContent = 'Join the Waitlist';
+      });
       var cta = body.querySelector('.btn-primary');
       if (cta) cta.addEventListener('click', function () { track('waitlist_click', { from: 'quiz_result' }); });
       // hand the answers to the lead form
