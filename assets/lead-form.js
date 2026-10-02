@@ -64,6 +64,7 @@
   var attribution = readAttribution();
 
   function fireConversion() {
+    try { if (typeof window.azhfTrack === 'function') window.azhfTrack('lead_submitted'); } catch (e) { /* ignore */ }
     if (typeof window.gtag === 'function') {
       try { window.gtag('event', 'conversion', { send_to: 'AW-697276669/j015CPqU-vEaEP2xvswC' }); } catch (e) { /* ignore */ }  // same conversion the original campaign optimized for; fires only after the server confirms the lead
     }

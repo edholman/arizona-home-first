@@ -2,6 +2,18 @@
 (function () {
   'use strict';
 
+  /* ---------- funnel tracking (Microsoft Clarity + dataLayer + Google tag) ---------- */
+  // Each step becomes a Clarity event (filter recordings by it) and a dataLayer/gtag event.
+  function track(name, props) {
+    props = props || {};
+    try { if (typeof window.clarity === 'function') { window.clarity('event', name); Object.keys(props).forEach(function (k) { window.clarity('set', k, String(props[k])); }); } } catch (e) { /* ignore */ }
+    try { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: 'azhf_' + name }, props)); } catch (e) { /* ignore */ }
+    try { if (typeof window.gtag === 'function') window.gtag('event', 'azhf_' + name, props); } catch (e) { /* ignore */ }
+  }
+  window.azhfTrack = track;
+  var once = {};
+  function trackOnce(name, props) { if (!once[name]) { once[name] = true; track(name, props); } }
+
   /* ---------- eligibility quiz ---------- */
   var QUESTIONS = [
     { key: 'first_time', q: 'Are you a first time homebuyer in Arizona?',
@@ -35,10 +47,14 @@
         q.opts.map(function (o) { return '<button type="button" class="quiz-option" data-v="' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') +
         '</div>' + (step > 0 ? '<button type="button" class="quiz-back">&larr; Back</button>' : '');
       Array.prototype.forEach.call(body.querySelectorAll('.quiz-option'), function (b) {
-        b.addEventListener('click', function () { answers[q.key] = b.getAttribute('data-v'); step++; step < QUESTIONS.length ? render() : finish(); });
+        b.addEventListener('click', function () {
+          if (step === 0) trackOnce('quiz_start');
+          track('quiz_answer', { quiz_step: step + 1, quiz_question: q.key });
+          answers[q.key] = b.getAttribute('data-v'); step++; step < QUESTIONS.length ? render() : finish();
+        });
       });
       var back = body.querySelector('.quiz-back');
-      if (back) back.addEventListener('click', function () { step--; render(); });
+      if (back) back.addEventListener('click', function () { track('quiz_back', { quiz_step: step + 1 }); step--; render(); });
     }
 
     function finish() {
@@ -54,6 +70,9 @@
           '<p>Some of your answers fall outside our current guidelines, but options open up often. ' +
           'Join our waitlist and we will reach out as options become available for your situation.</p>' +
           '<a class="btn btn-primary" href="#get-started">Join the Waitlist</a></div>';
+      track('quiz_complete', { quiz_result: likely ? 'likely' : 'needs_review' });
+      var cta = body.querySelector('.btn-primary');
+      if (cta) cta.addEventListener('click', function () { track('waitlist_click', { from: 'quiz_result' }); });
       // hand the answers to the lead form
       var form = document.querySelector('form.lead-form');
       if (form) {
@@ -87,8 +106,18 @@
       document.getElementById('calc-agent').textContent = money(agent);
       document.getElementById('calc-total').textContent = money(lender + agent);
     };
-    price.addEventListener('input', calc); down.addEventListener('change', calc);
+    price.addEventListener('input', function () { trackOnce('calculator_used'); calc(); });
+    down.addEventListener('change', function () { trackOnce('calculator_used'); calc(); });
     price.addEventListener('blur', function () { var p = parseFloat(String(price.value).replace(/[^0-9.]/g, '')); if (p) price.value = Math.round(p).toLocaleString('en-US'); });
     calc();
   }
+
+  /* ---------- form start + other waitlist buttons ---------- */
+  document.addEventListener('focusin', function (e) {
+    if (e.target.closest && e.target.closest('form.lead-form')) trackOnce('form_start');
+  });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href="#get-started"], a[href="#contact"]');
+    if (a && !a.closest('#quiz')) track('waitlist_click', { from: 'page_button' });
+  });
 })();
