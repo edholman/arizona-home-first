@@ -31,6 +31,7 @@ h2 { font-size: clamp(1.7rem, 3.5vw, 2.3rem); text-align: center; }
 .brand { display: flex; align-items: center; gap: 0.55rem; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 1.12rem; }
 .brand-mark { width: 34px; height: 34px; border-radius: 9px; }
 .brand span { color: var(--terracotta); }
+.brand .brand-name { font-weight: inherit; color: inherit; white-space: nowrap; }
 .nav { display: flex; align-items: center; gap: 1.4rem; }
 .nav a.link { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
 @media (max-width: 760px) { .nav a.link { display: none; } }

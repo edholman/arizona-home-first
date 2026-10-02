@@ -16,7 +16,7 @@ HEAD = '''<!DOCTYPE html>
   <style>.legal h2{text-align:left;font-size:1.3rem;margin-top:2rem}.legal{padding:3rem 0 4rem}.legal p,.legal li{color:#3b4449}</style>
 </head>
 <body>
-<header class="site-header"><div class="wrap"><a class="brand" href="/"><img class="brand-mark" src="/assets/favicon-192.png?v=1" alt="" width="34" height="34">Arizona Home <span>First</span></a><nav class="nav"><a class="btn btn-primary btn-small" href="/#eligibility">Check Eligibility</a></nav></div></header>
+<header class="site-header"><div class="wrap"><a class="brand" href="/"><img class="brand-mark" src="/assets/favicon-192.png?v=1" alt="" width="34" height="34"><b class="brand-name">Arizona Home <span>First</span></b></a></div></header>
 <main class="legal"><div class="wrap narrow">
 <h1>%(title)s</h1>
 <p class="fine">Last updated September 30, 2026</p>
