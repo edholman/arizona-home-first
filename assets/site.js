@@ -55,7 +55,6 @@
     { phase: 'elig', key: 'savings', q: 'Do you have at least 3.5% of the price saved, or a family member who can gift it?',
       opts: [['saved', 'Yes, saved'], ['gift', 'Yes, with a family gift'], ['no', 'Not yet']] }
   ];
-  var PHASE_LABEL = { goals: 'Your home goals', elig: 'Eligibility' };
   var LABEL = {};
   QUESTIONS.forEach(function (q) { q.opts.forEach(function (o) { LABEL[q.key + ':' + o[0]] = o[1]; }); });
 
@@ -67,23 +66,11 @@
 
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-    var sawIntro = false;
     function render() {
       bar.style.width = ((step + 1) / (QUESTIONS.length + 1) * 100) + '%';
       var q = QUESTIONS[step];
-      if (q.phase === 'elig' && QUESTIONS[step - 1] && QUESTIONS[step - 1].phase === 'goals' && !sawIntro) {
-        body.innerHTML =
-          '<div class="quiz-step-label">Part 2 of 2</div>' +
-          '<h3>Next: eligibility</h3>' +
-          '<p class="quiz-intro">These questions are similar to what a lender asks. Answer as accurately as you can so your review is accurate.</p>' +
-          '<button type="button" class="btn btn-primary quiz-continue">Continue</button>' +
-          '<button type="button" class="quiz-back">&larr; Back</button>';
-        body.querySelector('.quiz-continue').addEventListener('click', function () { sawIntro = true; track('quiz_part2'); render(); });
-        body.querySelector('.quiz-back').addEventListener('click', function () { step--; render(); });
-        return;
-      }
       body.innerHTML =
-        '<div class="quiz-step-label">' + PHASE_LABEL[q.phase] + ' &middot; Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
+        '<div class="quiz-step-label">Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
         '<h3>' + esc(q.q) + '</h3><div class="quiz-options">' +
         q.opts.map(function (o) { return '<button type="button" class="quiz-option" data-v="' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') +
         '</div>' + (step > 0 ? '<button type="button" class="quiz-back">&larr; Back</button>' : '');
@@ -95,7 +82,7 @@
         });
       });
       var back = body.querySelector('.quiz-back');
-      if (back) back.addEventListener('click', function () { track('quiz_back', { quiz_step: step + 1 }); if (q.phase === 'elig' && QUESTIONS[step - 1].phase === 'goals') { sawIntro = false; render(); return; } step--; render(); });
+      if (back) back.addEventListener('click', function () { track('quiz_back', { quiz_step: step + 1 }); step--; render(); });
     }
 
     function finish() {
