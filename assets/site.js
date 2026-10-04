@@ -27,7 +27,7 @@
   // Serious, lender-style questions. Everyone sees a result, but only after they enter their name and number.
   var QUESTIONS = [
     // Part 1: easy, aspirational
-    { phase: 'goals', key: 'assistance', q: 'How much homebuyer assistance are you hoping for?',
+    { phase: 'goals', key: 'assistance', q: 'How much assistance do you need?',
       opts: [['up to 5k', 'Up to $5,000'], ['5k-10k', '$5,000 to $10,000'], ['10k-25k', '$10,000 to $25,000'], ['not sure', 'Not sure yet']] },
     { phase: 'goals', key: 'area', q: 'Where in Arizona are you looking?',
       opts: [['Phoenix area', 'Phoenix area (Maricopa County)'], ['Pinal', 'San Tan Valley, Casa Grande, Maricopa (Pinal County)'], ['Tucson', 'Tucson area (Pima County)'], ['Other AZ', 'Somewhere else in Arizona']] },
@@ -123,7 +123,7 @@
       // Every qualify / waitlist button now goes to the form in the result
       Array.prototype.forEach.call(document.querySelectorAll('a[href="#eligibility"], a[href="#get-started"]'), function (a) {
         a.setAttribute('href', '#eligibility');
-        if (/check|join|reserve|results/i.test(a.textContent)) a.textContent = 'Submit My File for Review';
+        if (/check|join|reserve|results|eligib/i.test(a.textContent)) a.textContent = 'Submit My File for Review';
       });
       // Hand every answer to the lead form so the CRM sees the full screening
       var form = document.querySelector('form.lead-form');
