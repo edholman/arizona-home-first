@@ -28,7 +28,7 @@
   var QUESTIONS = [
     // Part 1: easy, aspirational
     { phase: 'goals', key: 'assistance', q: 'How much homebuyer assistance are you hoping for?',
-      opts: [['up to 5k', 'Up to $5,000'], ['5k-10k', '$5,000 to $10,000'], ['max', 'As much as I can get'], ['not sure', 'Not sure yet']] },
+      opts: [['up to 5k', 'Up to $5,000'], ['5k-10k', '$5,000 to $10,000'], ['10k-25k', '$10,000 to $25,000'], ['not sure', 'Not sure yet']] },
     { phase: 'goals', key: 'area', q: 'Where in Arizona are you looking?',
       opts: [['Phoenix area', 'Phoenix area (Maricopa County)'], ['Pinal', 'San Tan Valley, Casa Grande, Maricopa (Pinal County)'], ['Tucson', 'Tucson area (Pima County)'], ['Other AZ', 'Somewhere else in Arizona']] },
     { phase: 'goals', key: 'home_type', q: 'What type of home are you looking for?',
