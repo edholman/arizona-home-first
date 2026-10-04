@@ -67,7 +67,9 @@
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
     function render() {
-      bar.style.width = ((step + 1) / (QUESTIONS.length + 1) * 100) + '%';
+      // Front-loaded progress: halfway by the 3rd question, then small steps toward 95%
+      var pct = step < 3 ? [15, 33, 50][step] : 50 + (step - 2) / (QUESTIONS.length - 2) * 45;
+      bar.style.width = pct + '%';
       var q = QUESTIONS[step];
       body.innerHTML =
         '<h3>' + esc(q.q) + '</h3><div class="quiz-options">' +
