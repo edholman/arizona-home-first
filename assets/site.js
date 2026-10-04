@@ -26,27 +26,36 @@
   /* ---------- eligibility screening ---------- */
   // Serious, lender-style questions. Everyone sees a result, but only after they enter their name and number.
   var QUESTIONS = [
-    { key: 'owned_3yr', q: 'Have you owned a home, anywhere, in the past 3 years?',
+    // Part 1: easy, aspirational
+    { phase: 'goals', key: 'assistance', q: 'How much homebuyer assistance are you hoping for?',
+      opts: [['up to 5k', 'Up to $5,000'], ['5k-10k', '$5,000 to $10,000'], ['max', 'As much as I can get'], ['not sure', 'Not sure yet']] },
+    { phase: 'goals', key: 'area', q: 'Where in Arizona are you looking?',
+      opts: [['Phoenix area', 'Phoenix area (Maricopa County)'], ['Pinal', 'San Tan Valley, Casa Grande, Maricopa (Pinal County)'], ['Tucson', 'Tucson area (Pima County)'], ['Other AZ', 'Somewhere else in Arizona']] },
+    { phase: 'goals', key: 'home_type', q: 'What type of home are you looking for?',
+      opts: [['single family', 'Single family home'], ['townhome/condo', 'Townhome or condo'], ['new build', 'New construction'], ['open', 'Open to anything']] },
+    { phase: 'goals', key: 'price_range', q: 'What price range are you shopping in?',
+      opts: [['under-300k', 'Under $300,000'], ['300k-400k', '$300,000 to $400,000'], ['400k-500k', '$400,000 to $500,000'], ['500k+', '$500,000 or more']] },
+    { phase: 'goals', key: 'timeline', q: 'When do you plan to buy?',
+      opts: [['As soon as possible', 'As soon as possible'], ['Within 3 months', 'Within 3 months'], ['3 to 6 months', '3 to 6 months'], ['6 months or more', '6 months or more']] },
+    // Part 2: eligibility
+    { phase: 'elig', key: 'owned_3yr', q: 'Have you owned a home, anywhere, in the past 3 years?',
       opts: [['no', 'No'], ['yes', 'Yes']] },
-    { key: 'primary', q: 'Will this home be your primary residence?',
+    { phase: 'elig', key: 'primary', q: 'Will this home be your primary residence?',
       opts: [['yes', 'Yes, I will live in it'], ['no', 'No, it is an investment or second home']] },
-    { key: 'agent', q: 'Have you signed a buyer agreement with a real estate agent?',
+    { phase: 'elig', key: 'agent', q: 'Have you signed a buyer agreement with a real estate agent?',
       opts: [['no', 'No'], ['yes', 'Yes, I have signed one']] },
-    { key: 'county', q: 'Where in Arizona are you buying?',
-      opts: [['Maricopa', 'Maricopa County'], ['Pinal', 'Pinal County'], ['Pima', 'Pima County'], ['Other AZ', 'Another Arizona county']] },
-    { key: 'credit', q: 'What is your estimated credit score?',
+    { phase: 'elig', key: 'credit', q: 'What is your estimated credit score?',
       opts: [['740+', '740 or higher'], ['680-739', '680 to 739'], ['620-679', '620 to 679'], ['580-619', '580 to 619'], ['below-580', 'Below 580']] },
-    { key: 'derog', q: 'Any foreclosure, short sale, or bankruptcy in the past 3 years?',
+    { phase: 'elig', key: 'derog', q: 'Any foreclosure, short sale, or bankruptcy in the past 3 years?',
       opts: [['no', 'No'], ['yes', 'Yes']] },
-    { key: 'employment', q: 'Do you have 2 years of steady income history?',
+    { phase: 'elig', key: 'employment', q: 'Do you have 2 years of steady income history?',
       opts: [['w2', 'Yes, employed (W-2)'], ['self', 'Yes, self-employed or 1099'], ['less', 'Less than 2 years']] },
-    { key: 'income', q: 'Is your total household income above $155,000 a year?',
+    { phase: 'elig', key: 'income', q: 'Is your total household income above $155,000 a year?',
       opts: [['no', 'No'], ['yes', 'Yes']] },
-    { key: 'savings', q: 'Do you have at least 3.5% of the price saved, or a family member who can gift it?',
-      opts: [['saved', 'Yes, saved'], ['gift', 'Yes, with a family gift'], ['no', 'Not yet']] },
-    { key: 'timeline', q: 'When do you plan to buy?',
-      opts: [['As soon as possible', 'As soon as possible'], ['Within 3 months', 'Within 3 months'], ['3 to 6 months', '3 to 6 months'], ['6 months or more', '6 months or more']] }
+    { phase: 'elig', key: 'savings', q: 'Do you have at least 3.5% of the price saved, or a family member who can gift it?',
+      opts: [['saved', 'Yes, saved'], ['gift', 'Yes, with a family gift'], ['no', 'Not yet']] }
   ];
+  var PHASE_LABEL = { goals: 'Your home goals', elig: 'Eligibility' };
   var LABEL = {};
   QUESTIONS.forEach(function (q) { q.opts.forEach(function (o) { LABEL[q.key + ':' + o[0]] = o[1]; }); });
 
@@ -58,11 +67,23 @@
 
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+    var sawIntro = false;
     function render() {
       bar.style.width = ((step + 1) / (QUESTIONS.length + 1) * 100) + '%';
       var q = QUESTIONS[step];
+      if (q.phase === 'elig' && QUESTIONS[step - 1] && QUESTIONS[step - 1].phase === 'goals' && !sawIntro) {
+        body.innerHTML =
+          '<div class="quiz-step-label">Part 2 of 2</div>' +
+          '<h3>Next: eligibility</h3>' +
+          '<p class="quiz-intro">These questions are similar to what a lender asks. Answer as accurately as you can so your review is accurate.</p>' +
+          '<button type="button" class="btn btn-primary quiz-continue">Continue</button>' +
+          '<button type="button" class="quiz-back">&larr; Back</button>';
+        body.querySelector('.quiz-continue').addEventListener('click', function () { sawIntro = true; track('quiz_part2'); render(); });
+        body.querySelector('.quiz-back').addEventListener('click', function () { step--; render(); });
+        return;
+      }
       body.innerHTML =
-        '<div class="quiz-step-label">Eligibility screening &middot; Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
+        '<div class="quiz-step-label">' + PHASE_LABEL[q.phase] + ' &middot; Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
         '<h3>' + esc(q.q) + '</h3><div class="quiz-options">' +
         q.opts.map(function (o) { return '<button type="button" class="quiz-option" data-v="' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') +
         '</div>' + (step > 0 ? '<button type="button" class="quiz-back">&larr; Back</button>' : '');
@@ -74,7 +95,7 @@
         });
       });
       var back = body.querySelector('.quiz-back');
-      if (back) back.addEventListener('click', function () { track('quiz_back', { quiz_step: step + 1 }); step--; render(); });
+      if (back) back.addEventListener('click', function () { track('quiz_back', { quiz_step: step + 1 }); if (q.phase === 'elig' && QUESTIONS[step - 1].phase === 'goals') { sawIntro = false; render(); return; } step--; render(); });
     }
 
     function finish() {
@@ -82,8 +103,8 @@
       // Answers that need a specialist's look before we say "may qualify"
       var review = answers.owned_3yr === 'yes' || answers.primary === 'no' || answers.agent === 'yes';
       body.innerHTML =
-        '<div class="quiz-result gate"><h3>Your screening is complete.</h3>' +
-        '<p>Enter your name and mobile number to see your results and reserve your spot.</p>' +
+        '<div class="quiz-result gate"><h3>Your file is ready for review.</h3>' +
+        '<p>Final eligibility is confirmed in a one-on-one review with a program specialist. Enter your name and mobile number to submit your file and see your results.</p>' +
         '<div class="quiz-form-slot"></div></div>';
       track('quiz_complete', { quiz_result: review ? 'needs_review' : 'likely' });
 
@@ -93,7 +114,7 @@
       if (card && slot) {
         var holder = document.createElement('div');
         holder.className = 'form-moved-note';
-        holder.innerHTML = '<a class="btn btn-primary" href="#eligibility">See My Results</a>';
+        holder.innerHTML = '<a class="btn btn-primary" href="#eligibility">Submit My File for Review</a>';
         card.parentNode.insertBefore(holder, card);
         slot.appendChild(card);
         card.classList.add('in-quiz');
@@ -104,24 +125,24 @@
           wrap.style.display = 'none';
           var lbl = card.querySelector('label[for="' + el.id + '"]'); if (lbl) lbl.style.display = 'none';
         });
-        var btn = card.querySelector('button[type="submit"]'); if (btn) btn.textContent = 'See My Results';
+        var btn = card.querySelector('button[type="submit"]'); if (btn) btn.textContent = 'Submit My File for Review';
         var ok = card.querySelector('.lead-success');
         if (ok) ok.innerHTML = review
-          ? '<strong>Thanks, your screening has been received.</strong><p>Some of your answers need a quick review. A program specialist will contact you shortly to go over your options.</p>'
-          : '<strong>You may qualify for up to $10,000 in homebuyer assistance.</strong><p>Your spot is reserved. A program specialist will contact you shortly to confirm your eligibility and next steps.</p>';
+          ? '<strong>Your file has been submitted.</strong><p>Some of your answers need a closer look. A program specialist will contact you shortly for your one-on-one review.</p>'
+          : '<strong>You may qualify for up to $10,000 in homebuyer assistance.</strong><p>Your file has been submitted and your spot is reserved. A program specialist will contact you shortly for your one-on-one eligibility review.</p>';
       }
       if (quiz.getBoundingClientRect().top < 0) quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
       // Every qualify / waitlist button now goes to the form in the result
       Array.prototype.forEach.call(document.querySelectorAll('a[href="#eligibility"], a[href="#get-started"]'), function (a) {
         a.setAttribute('href', '#eligibility');
-        if (/check|join|reserve/i.test(a.textContent)) a.textContent = 'See My Results';
+        if (/check|join|reserve|results/i.test(a.textContent)) a.textContent = 'Submit My File for Review';
       });
       // Hand every answer to the lead form so the CRM sees the full screening
       var form = document.querySelector('form.lead-form');
       if (form) {
         var set = function (name, val) { var el = form.querySelector('[name="' + name + '"]'); if (el) el.value = val; };
         set('timeline', answers.timeline || '');
-        set('price_range', '');
+        set('price_range', LABEL['price_range:' + answers.price_range] || '');
         var summary = 'Screening: ' + QUESTIONS.map(function (q) {
           return q.key + ' ' + (LABEL[q.key + ':' + answers[q.key]] || '');
         }).join('; ') + '; result: ' + (review ? 'needs review' : 'may qualify');
