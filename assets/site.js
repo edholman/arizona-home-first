@@ -70,7 +70,6 @@
       bar.style.width = ((step + 1) / (QUESTIONS.length + 1) * 100) + '%';
       var q = QUESTIONS[step];
       body.innerHTML =
-        '<div class="quiz-step-label">Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
         '<h3>' + esc(q.q) + '</h3><div class="quiz-options">' +
         q.opts.map(function (o) { return '<button type="button" class="quiz-option" data-v="' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') +
         '</div>' + (step > 0 ? '<button type="button" class="quiz-back">&larr; Back</button>' : '');
