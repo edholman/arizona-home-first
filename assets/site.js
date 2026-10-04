@@ -23,17 +23,28 @@
   var once = {};
   function trackOnce(name, props) { if (!once[name]) { once[name] = true; track(name, props); } }
 
-  /* ---------- eligibility quiz ---------- */
+  /* ---------- eligibility screening ---------- */
+  // Serious, lender-style questions. Everyone sees a result, but only after they enter their name and number.
   var QUESTIONS = [
-    { key: 'first_time', q: 'Are you a first time homebuyer in Arizona?',
-      opts: [['yes', 'Yes, this will be my first home'], ['no', 'No, I have owned a home before']] },
+    { key: 'owned_3yr', q: 'Have you owned a home, anywhere, in the past 3 years?',
+      opts: [['no', 'No'], ['yes', 'Yes']] },
+    { key: 'primary', q: 'Will this home be your primary residence?',
+      opts: [['yes', 'Yes, I will live in it'], ['no', 'No, it is an investment or second home']] },
+    { key: 'agent', q: 'Have you signed a buyer agreement with a real estate agent?',
+      opts: [['no', 'No'], ['yes', 'Yes, I have signed one']] },
+    { key: 'county', q: 'Where in Arizona are you buying?',
+      opts: [['Maricopa', 'Maricopa County'], ['Pinal', 'Pinal County'], ['Pima', 'Pima County'], ['Other AZ', 'Another Arizona county']] },
     { key: 'credit', q: 'What is your estimated credit score?',
-      opts: [['740+', '740 or higher (Excellent)'], ['680-739', '680 to 739 (Good)'], ['620-679', '620 to 679 (Fair)'], ['below-620', 'Below 620']] },
-    { key: 'income', q: 'What is your household annual income?',
-      opts: [['100k+', '$100,000 or more'], ['70k-99k', '$70,000 to $99,999'], ['50k-69k', '$50,000 to $69,999'], ['below-50k', 'Below $50,000']] },
-    { key: 'price_range', q: 'What is your target home price?',
-      opts: [['400k+', '$400,000 or more'], ['300k-399k', '$300,000 to $399,999'], ['200k-299k', '$200,000 to $299,999'], ['below-200k', 'Below $200,000']] },
-    { key: 'timeline', q: 'When are you hoping to buy?',
+      opts: [['740+', '740 or higher'], ['680-739', '680 to 739'], ['620-679', '620 to 679'], ['580-619', '580 to 619'], ['below-580', 'Below 580']] },
+    { key: 'derog', q: 'Any foreclosure, short sale, or bankruptcy in the past 3 years?',
+      opts: [['no', 'No'], ['yes', 'Yes']] },
+    { key: 'employment', q: 'Do you have 2 years of steady income history?',
+      opts: [['w2', 'Yes, employed (W-2)'], ['self', 'Yes, self-employed or 1099'], ['less', 'Less than 2 years']] },
+    { key: 'income', q: 'Is your total household income above $155,000 a year?',
+      opts: [['no', 'No'], ['yes', 'Yes']] },
+    { key: 'savings', q: 'Do you have at least 3.5% of the price saved, or a family member who can gift it?',
+      opts: [['saved', 'Yes, saved'], ['gift', 'Yes, with a family gift'], ['no', 'Not yet']] },
+    { key: 'timeline', q: 'When do you plan to buy?',
       opts: [['As soon as possible', 'As soon as possible'], ['Within 3 months', 'Within 3 months'], ['3 to 6 months', '3 to 6 months'], ['6 months or more', '6 months or more']] }
   ];
   var LABEL = {};
@@ -51,7 +62,7 @@
       bar.style.width = ((step + 1) / (QUESTIONS.length + 1) * 100) + '%';
       var q = QUESTIONS[step];
       body.innerHTML =
-        '<div class="quiz-step-label">Question ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
+        '<div class="quiz-step-label">Eligibility screening &middot; Step ' + (step + 1) + ' of ' + QUESTIONS.length + '</div>' +
         '<h3>' + esc(q.q) + '</h3><div class="quiz-options">' +
         q.opts.map(function (o) { return '<button type="button" class="quiz-option" data-v="' + esc(o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') +
         '</div>' + (step > 0 ? '<button type="button" class="quiz-back">&larr; Back</button>' : '');
@@ -68,49 +79,52 @@
 
     function finish() {
       bar.style.width = '100%';
-      // same qualifying logic as the original program: credit 620+ and income $50k+
-      var likely = answers.credit !== 'below-620' && answers.income !== 'below-50k';
-      body.innerHTML = likely
-        ? '<div class="quiz-result"><div class="badge">&#10003;</div><h3>Great news! You may qualify.</h3>' +
-          '<p>Based on your answers, you may qualify for up to <strong>$10,000 in homebuyer assistance</strong>. ' +
-          'Reserve your spot on the waitlist below, and a program specialist will reach out to confirm your eligibility.</p>' +
-          '<div class="quiz-form-slot"></div></div>'
-        : '<div class="quiz-result maybe"><div class="badge">&#8594;</div><h3>Thanks for checking!</h3>' +
-          '<p>Some of your answers fall outside our current guidelines, but options open up often. ' +
-          'Join the waitlist below and we will reach out as options become available for your situation.</p>' +
-          '<div class="quiz-form-slot"></div></div>';
-      track('quiz_complete', { quiz_result: likely ? 'likely' : 'needs_review' });
-      // Put the waitlist form right inside the result, so there is nothing to scroll to.
+      // Answers that need a specialist's look before we say "may qualify"
+      var review = answers.owned_3yr === 'yes' || answers.primary === 'no' || answers.agent === 'yes';
+      body.innerHTML =
+        '<div class="quiz-result gate"><h3>Your screening is complete.</h3>' +
+        '<p>Enter your name and mobile number to see your results and reserve your spot.</p>' +
+        '<div class="quiz-form-slot"></div></div>';
+      track('quiz_complete', { quiz_result: review ? 'needs_review' : 'likely' });
+
+      // Move the form into the result, trimmed to name + phone + consent
       var card = document.querySelector('#get-started .lead-card');
       var slot = body.querySelector('.quiz-form-slot');
       if (card && slot) {
         var holder = document.createElement('div');
         holder.className = 'form-moved-note';
-        holder.innerHTML = '<a class="btn btn-primary" href="#eligibility">Reserve My Spot</a>';
+        holder.innerHTML = '<a class="btn btn-primary" href="#eligibility">See My Results</a>';
         card.parentNode.insertBefore(holder, card);
         slot.appendChild(card);
         card.classList.add('in-quiz');
-        var when = card.querySelector('[name="timeline"]');
-        if (when) { var lbl = card.querySelector('label[for="' + when.id + '"]'); when.style.display = 'none'; if (lbl) lbl.style.display = 'none'; }
+        ['timeline', 'email'].forEach(function (n) {
+          var el = card.querySelector('[name="' + n + '"]');
+          if (!el) return;
+          var wrap = el.closest('.span2') || el;
+          wrap.style.display = 'none';
+          var lbl = card.querySelector('label[for="' + el.id + '"]'); if (lbl) lbl.style.display = 'none';
+        });
+        var btn = card.querySelector('button[type="submit"]'); if (btn) btn.textContent = 'See My Results';
+        var ok = card.querySelector('.lead-success');
+        if (ok) ok.innerHTML = review
+          ? '<strong>Thanks, your screening has been received.</strong><p>Some of your answers need a quick review. A program specialist will contact you shortly to go over your options.</p>'
+          : '<strong>You may qualify for up to $10,000 in homebuyer assistance.</strong><p>Your spot is reserved. A program specialist will contact you shortly to confirm your eligibility and next steps.</p>';
       }
       if (quiz.getBoundingClientRect().top < 0) quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Every "Check If You Qualify" / "Join the Waitlist" button now goes to the form in the result.
+      // Every qualify / waitlist button now goes to the form in the result
       Array.prototype.forEach.call(document.querySelectorAll('a[href="#eligibility"], a[href="#get-started"]'), function (a) {
         a.setAttribute('href', '#eligibility');
-        if (/check|join/i.test(a.textContent)) a.textContent = 'Reserve My Spot';
+        if (/check|join|reserve/i.test(a.textContent)) a.textContent = 'See My Results';
       });
-      // hand the answers to the lead form
+      // Hand every answer to the lead form so the CRM sees the full screening
       var form = document.querySelector('form.lead-form');
       if (form) {
         var set = function (name, val) { var el = form.querySelector('[name="' + name + '"]'); if (el) el.value = val; };
-        set('price_range', LABEL['price_range:' + answers.price_range] || '');
         set('timeline', answers.timeline || '');
-        var summary = 'Quiz: ' + [
-          'first time buyer: ' + (answers.first_time === 'yes' ? 'yes' : 'no'),
-          'credit ' + (LABEL['credit:' + answers.credit] || ''),
-          'income ' + (LABEL['income:' + answers.income] || ''),
-          'target ' + (LABEL['price_range:' + answers.price_range] || ''),
-          'result: ' + (likely ? 'likely qualifies' : 'needs review')].join('; ');
+        set('price_range', '');
+        var summary = 'Screening: ' + QUESTIONS.map(function (q) {
+          return q.key + ' ' + (LABEL[q.key + ':' + answers[q.key]] || '');
+        }).join('; ') + '; result: ' + (review ? 'needs review' : 'may qualify');
         set('message', summary);
       }
     }
