@@ -225,12 +225,11 @@
       <div class="quiz-summary" id="quiz-summary" hidden></div>
       <form class="lead-form" data-form-name="azhf_home" data-lang="en" data-success="inline" novalidate>
         <div class="lead-row">
-          <div><label for="f-first">First name</label><input id="f-first" type="text" name="first_name" autocomplete="given-name"></div>
-          <div><label for="f-last">Last name</label><input id="f-last" type="text" name="last_name" autocomplete="family-name"></div>
+          <div><label for="f-name">Name</label><input id="f-name" type="text" name="full_name" autocomplete="name"></div>
+          <div><label for="f-phone">Mobile phone</label><input id="f-phone" type="tel" name="phone" autocomplete="tel" inputmode="tel" required></div>
         </div>
         <div class="lead-row">
-          <div><label for="f-phone">Mobile phone</label><input id="f-phone" type="tel" name="phone" autocomplete="tel" inputmode="tel" required></div>
-          <div><label for="f-email">Email</label><input id="f-email" type="email" name="email" autocomplete="email"></div>
+          <div class="span2"><label for="f-email">Email <span class="opt">(optional)</span></label><input id="f-email" type="email" name="email" autocomplete="email"></div>
         </div>
         <label for="f-when">When are you hoping to buy? <span class="opt">(optional)</span></label>
         <select id="f-when" name="timeline">

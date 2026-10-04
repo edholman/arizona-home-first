@@ -106,6 +106,13 @@
       });
       var consentTextEl = form.querySelector('.lead-consent-text');
       payload.consent_text = consentTextEl ? consentTextEl.textContent.replace(/\s+/g, ' ').trim() : '';
+      // Single "Name" field: send it as first_name / last_name like before
+      if (payload.full_name) {
+        var parts = payload.full_name.replace(/\s+/g, ' ').trim().split(' ');
+        payload.first_name = parts.shift();
+        if (parts.length) payload.last_name = parts.join(' ');
+        delete payload.full_name;
+      }
       payload.page_url = window.location.href;
       payload.form_name = form.getAttribute('data-form-name') || 'website';
       Object.keys(attribution).forEach(function (k) { if (attribution[k] && !payload[k]) payload[k] = attribution[k]; });

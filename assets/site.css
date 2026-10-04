@@ -150,3 +150,4 @@ footer a { color: white; }
 /* Waitlist form shown inside the quiz result */
 .quiz-result .lead-card.in-quiz { margin: 1.2rem 0 0; box-shadow: none; padding: 0; text-align: left; max-width: none; }
 .form-moved-note { text-align: center; }
+.lead-form .lead-row .span2 { grid-column: 1 / -1; }
